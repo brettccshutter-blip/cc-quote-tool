@@ -14,6 +14,7 @@ body{
   color:#111;
 }
 .container{ max-width:1000px; margin:auto; }
+
 .header{
   border-bottom:2px solid #000;
   padding-bottom:12px;
@@ -32,13 +33,14 @@ body{
 
 .section{ margin-bottom:20px; }
 label{ font-size:13px; color:#555; }
+
 input, select{
-  width:100%;
   padding:8px;
-  margin:5px 0 12px 0;
   border:1px solid #ccc;
   border-radius:6px;
   font-size:16px;
+  width:100%;
+  box-sizing:border-box;
 }
 
 .grid{
@@ -46,6 +48,13 @@ input, select{
   grid-template-columns:1fr 1fr;
   gap:15px;
 }
+
+.flexline{
+  display:flex;
+  gap:10px;
+  margin-top:5px;
+}
+
 button{
   padding:10px 14px;
   margin-right:10px;
@@ -61,6 +70,7 @@ button.clear{
   color:#c00;
   border:1px solid #c00;
 }
+
 table{
   width:100%;
   border-collapse:collapse;
@@ -72,11 +82,13 @@ th, td{
   text-align:left;
 }
 th{ background:#f5f5f5; }
+
 .total{
   font-size:20px;
   font-weight:bold;
   margin-top:15px;
 }
+
 .signature{
   margin-top:40px;
   display:grid;
@@ -136,30 +148,24 @@ th{ background:#f5f5f5; }
 
 <hr>
 
-<div class="section grid">
-  <div>
-    <label>Room / Location</label>
-    <input id="room">
+<div class="section">
+  <label>Room / Location</label>
+  <input id="room">
+
+  <div style="margin-top:15px;">
+    <label>Width</label>
+    <div class="flexline">
+      <input id="wWhole" type="number" value="0" placeholder="Whole inches" style="flex:2;">
+      <select id="wFrac" style="flex:1;"></select>
+    </div>
   </div>
 
-  <div>
-    <label>Width (Whole Inches)</label>
-    <input id="wWhole" type="number" value="0">
-  </div>
-
-  <div>
-    <label>Width Fraction</label>
-    <select id="wFrac"></select>
-  </div>
-
-  <div>
-    <label>Height (Whole Inches)</label>
-    <input id="hWhole" type="number" value="0">
-  </div>
-
-  <div>
-    <label>Height Fraction</label>
-    <select id="hFrac"></select>
+  <div style="margin-top:15px;">
+    <label>Height</label>
+    <div class="flexline">
+      <input id="hWhole" type="number" value="0" placeholder="Whole inches" style="flex:2;">
+      <select id="hFrac" style="flex:1;"></select>
+    </div>
   </div>
 </div>
 
@@ -248,11 +254,13 @@ return isFinite(v)?v:0;
 }
 
 function addWindow(){
+
 const room=document.getElementById("room").value;
 const wWhole=num("wWhole");
 const hWhole=num("hWhole");
 const wFrac=num("wFrac");
 const hFrac=num("hFrac");
+
 const w=wWhole+wFrac;
 const h=hWhole+hFrac;
 
@@ -274,7 +282,7 @@ const total=subtotal+tax;
 
 job.push({
 room:room||"-",
-size:`${wWhole}" x ${hWhole}"`,
+size:`${wWhole} ${document.getElementById("wFrac").selectedOptions[0].text} x ${hWhole} ${document.getElementById("hFrac").selectedOptions[0].text}`,
 sqft,
 total
 });
