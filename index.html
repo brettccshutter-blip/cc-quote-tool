@@ -26,10 +26,7 @@ body{
 .header h1{ margin:0; }
 .header .info{ font-size:13px; color:#444; margin-top:4px; }
 
-.meta{
-  text-align:right;
-  font-size:13px;
-}
+.meta{ text-align:right; font-size:13px; }
 
 .section{ margin-bottom:20px; }
 label{ font-size:13px; color:#555; }
@@ -41,12 +38,6 @@ input, select{
   font-size:16px;
   width:100%;
   box-sizing:border-box;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
 }
 
 .flexline{
@@ -127,20 +118,23 @@ th{ background:#f5f5f5; }
   </div>
 </div>
 
-<div class="section grid">
-  <div>
+<div class="section flexline">
+  <div style="flex:1;">
     <label>Customer Name</label>
     <input id="custName">
   </div>
-  <div>
+  <div style="flex:1;">
     <label>Phone / Email</label>
     <input id="custContact">
   </div>
-  <div>
+</div>
+
+<div class="section flexline">
+  <div style="flex:1;">
     <label>Job Address</label>
     <input id="jobAddress">
   </div>
-  <div>
+  <div style="flex:1;">
     <label>Quote / Job #</label>
     <input id="jobNumber">
   </div>
@@ -155,7 +149,7 @@ th{ background:#f5f5f5; }
   <div style="margin-top:15px;">
     <label>Width</label>
     <div class="flexline">
-      <input id="wWhole" type="number" value="0" placeholder="Whole inches" style="flex:2;">
+      <input id="wWhole" type="number" value="0" class="autoClear" style="flex:2;">
       <select id="wFrac" style="flex:1;"></select>
     </div>
   </div>
@@ -163,35 +157,34 @@ th{ background:#f5f5f5; }
   <div style="margin-top:15px;">
     <label>Height</label>
     <div class="flexline">
-      <input id="hWhole" type="number" value="0" placeholder="Whole inches" style="flex:2;">
+      <input id="hWhole" type="number" value="0" class="autoClear" style="flex:2;">
       <select id="hFrac" style="flex:1;"></select>
     </div>
   </div>
 </div>
 
-<div class="section grid">
-  <div>
+<div class="section flexline">
+  <div style="flex:1;">
     <label>Price Per Sq Ft</label>
-    <input id="price" type="number" value="0">
+    <input id="price" type="number" value="0" class="autoClear">
   </div>
-  <div>
+  <div style="flex:1;">
     <label>Extra Fees</label>
-    <input id="extras" type="number" value="0">
+    <input id="extras" type="number" value="0" class="autoClear">
   </div>
-  <div>
+  <div style="flex:1;">
     <label>Installation Fee</label>
-    <input id="install" type="number" value="0">
+    <input id="install" type="number" value="0" class="autoClear">
   </div>
-  <div>
+  <div style="flex:1;">
     <label>Tax %</label>
-    <input id="tax" type="number" value="0">
+    <input id="tax" type="number" value="0" class="autoClear">
   </div>
 </div>
 
 <button onclick="addWindow()">Add Window</button>
 <button onclick="window.print()">Print / Save PDF</button>
-<button onclick="emailQuote()">Email Quote</button>
-<button class="clear" onclick="clearJob()">Clear Job</button>
+<button onclick="clearJob()" class="clear">Clear Job</button>
 
 <table>
 <thead>
@@ -208,29 +201,12 @@ th{ background:#f5f5f5; }
 
 <div class="total" id="grandTotal">Grand Total: $0.00</div>
 
-<div class="signature">
-  <div>
-    <div class="line"></div>
-    <div class="small">Customer Signature</div>
-  </div>
-  <div>
-    <div class="line"></div>
-    <div class="small">Date</div>
-  </div>
-</div>
-
 </div>
 
 <script>
 const FRACTIONS = [
-["0",0],
-["1/8",0.125],
-["1/4",0.25],
-["3/8",0.375],
-["1/2",0.5],
-["5/8",0.625],
-["3/4",0.75],
-["7/8",0.875]
+["0",0],["1/8",0.125],["1/4",0.25],["3/8",0.375],
+["1/2",0.5],["5/8",0.625],["3/4",0.75],["7/8",0.875]
 ];
 
 let job=[];
@@ -254,7 +230,6 @@ return isFinite(v)?v:0;
 }
 
 function addWindow(){
-
 const room=document.getElementById("room").value;
 const wWhole=num("wWhole");
 const hWhole=num("hWhole");
@@ -328,17 +303,14 @@ render();
 clearInputs();
 }
 
-function emailQuote(){
-let grand=0;
-let lines=job.map((it,i)=>{
-grand+=it.total;
-return `${i+1}. ${it.room} - ${it.size} - ${it.sqft} sq ft - $${it.total.toFixed(2)}`;
-}).join("\n");
-
-const subject=`C&C Quote`;
-const body=`Grand Total: $${grand.toFixed(2)}\n\n${lines}`;
-window.location.href=`mailto:Brett.ccshutter@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+// Auto-clear zero when field clicked
+document.querySelectorAll(".autoClear").forEach(input=>{
+input.addEventListener("focus",function(){
+if(this.value==="0"){
+this.select();
 }
+});
+});
 
 document.getElementById("jobNumber").addEventListener("input",()=>{
 document.getElementById("jobOut").innerText=
