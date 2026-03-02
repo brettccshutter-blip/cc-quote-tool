@@ -80,18 +80,6 @@ th{ background:#f5f5f5; }
   margin-top:15px;
 }
 
-.signature{
-  margin-top:40px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:40px;
-}
-.line{
-  border-bottom:1px solid #000;
-  height:25px;
-}
-.small{ font-size:12px; color:#555; margin-top:6px; }
-
 @media print{
   button{ display:none; }
   body{ padding:0; }
@@ -194,17 +182,6 @@ th{ background:#f5f5f5; }
 
 <div class="total" id="grandTotal">Grand Total: $0.00</div>
 
-<div class="signature">
-  <div>
-    <div class="line"></div>
-    <div class="small">Customer Signature</div>
-  </div>
-  <div>
-    <div class="line"></div>
-    <div class="small">Date</div>
-  </div>
-</div>
-
 </div>
 
 <script>
@@ -220,7 +197,7 @@ function populateFractions(){
   ["wFrac","hFrac"].forEach(id=>{
     const sel=document.getElementById(id);
     sel.innerHTML="";
-    FRACTIONS.forEach(([label,val])=>{
+    FRACTIONS.forEach(([label,val)=>{
       const opt=document.createElement("option");
       opt.value=val;
       opt.textContent=label;
@@ -250,7 +227,7 @@ function addWindow(){
     savedPrice=num("price");
   }
 
-  const extras=num("extras"); // per-window
+  const extras=num("extras");
 
   const adjW=w+5;
   const adjH=h+5;
@@ -296,22 +273,19 @@ function clearInputs(){
   document.getElementById("hWhole").value=0;
   document.getElementById("wFrac").value="0";
   document.getElementById("hFrac").value="0";
-  document.getElementById("extras").value=0; // clears extra fee after each window
+  document.getElementById("extras").value=0;
 }
 
 function clearJob(){
-  // clear job list + totals
   job=[];
   savedPrice=null;
 
-  // clear ALL customer/job info
   document.getElementById("custName").value="";
   document.getElementById("custContact").value="";
   document.getElementById("jobAddress").value="";
   document.getElementById("jobNumber").value="";
   document.getElementById("jobOut").innerText="—";
 
-  // reset pricing
   document.getElementById("price").value=0;
   document.getElementById("extras").value=0;
 
@@ -339,19 +313,15 @@ Quote/Job #: ${jobNumber}
 Windows:
 ${lines || "(none)"}
 
-Grand Total: $${grand.toFixed(2)}
-
-Tip: To attach a PDF, click "Print / Save PDF" first, then attach it to this email.`;
+Grand Total: $${grand.toFixed(2)}`;
 
   window.location.href =
     `mailto:Brett.ccshutter@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".autoClear").forEach(input=>{
-    input.addEventListener("focus", function(){
-      if(this.value === "0"){ this.select(); }
-    });
+document.querySelectorAll(".autoClear").forEach(input=>{
+  input.addEventListener("focus",function(){
+    if(this.value==="0"){ this.select(); }
   });
 });
 
