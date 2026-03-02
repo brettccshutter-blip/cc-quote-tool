@@ -219,14 +219,14 @@ let savedPrice=null;
 function populateFractions(){
   ["wFrac","hFrac"].forEach(id=>{
     const sel=document.getElementById(id);
-    sel.innerHTML = "";
+    sel.innerHTML="";
     FRACTIONS.forEach(([label,val])=>{
       const opt=document.createElement("option");
       opt.value=val;
       opt.textContent=label;
       sel.appendChild(opt);
     });
-    sel.value = "0";
+    sel.value="0";
   });
 }
 
@@ -246,14 +246,12 @@ function addWindow(){
   const w=wWhole+wFrac;
   const h=hWhole+hFrac;
 
-  // price stays for the job once set
   if(savedPrice===null || savedPrice===0){
     savedPrice=num("price");
   }
 
   const extras=num("extras"); // per-window
 
-  // +5" pricing only
   const adjW=w+5;
   const adjH=h+5;
 
@@ -302,9 +300,21 @@ function clearInputs(){
 }
 
 function clearJob(){
+  // clear job list + totals
   job=[];
   savedPrice=null;
-  document.getElementById("price").value=0; // reset price per ft when job cleared
+
+  // clear ALL customer/job info
+  document.getElementById("custName").value="";
+  document.getElementById("custContact").value="";
+  document.getElementById("jobAddress").value="";
+  document.getElementById("jobNumber").value="";
+  document.getElementById("jobOut").innerText="—";
+
+  // reset pricing
+  document.getElementById("price").value=0;
+  document.getElementById("extras").value=0;
+
   render();
   clearInputs();
 }
@@ -337,7 +347,6 @@ Tip: To attach a PDF, click "Print / Save PDF" first, then attach it to this ema
     `mailto:Brett.ccshutter@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-// Auto-replace zero when typing: highlight 0 on focus
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".autoClear").forEach(input=>{
     input.addEventListener("focus", function(){
