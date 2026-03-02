@@ -101,7 +101,7 @@ th{ background:#f5f5f5; }
   </div>
   <div class="meta">
     <div><b>Estimate</b></div>
-    <div id="today"></div>
+    <div>Date: <span id="today"></span></div>
     <div>Quote #: <span id="jobOut">—</span></div>
   </div>
 </div>
@@ -197,7 +197,7 @@ function populateFractions(){
   ["wFrac","hFrac"].forEach(id=>{
     const sel=document.getElementById(id);
     sel.innerHTML="";
-    FRACTIONS.forEach(([label,val)=>{
+    FRACTIONS.forEach(([label,val])=>{
       const opt=document.createElement("option");
       opt.value=val;
       opt.textContent=label;
@@ -325,13 +325,14 @@ document.querySelectorAll(".autoClear").forEach(input=>{
   });
 });
 
+// AUTO DATE RESTORED
+document.getElementById("today").innerText =
+  new Date().toLocaleDateString();
+
 document.getElementById("jobNumber").addEventListener("input",()=>{
   document.getElementById("jobOut").innerText=
     document.getElementById("jobNumber").value||"—";
 });
-
-document.getElementById("today").innerText=
-  new Date().toLocaleDateString();
 
 populateFractions();
 </script>
