@@ -169,7 +169,7 @@ th{ background:#f5f5f5; }
     <input id="price" type="number" value="0" class="autoClear">
   </div>
   <div style="flex:1;">
-    <label>Extra Fees</label>
+    <label>Extra Fees (per window)</label>
     <input id="extras" type="number" value="0" class="autoClear">
   </div>
 </div>
@@ -217,118 +217,142 @@ let job=[];
 let savedPrice=null;
 
 function populateFractions(){
-["wFrac","hFrac"].forEach(id=>{
-const sel=document.getElementById(id);
-FRACTIONS.forEach(([label,val])=>{
-const opt=document.createElement("option");
-opt.value=val;
-opt.textContent=label;
-sel.appendChild(opt);
-});
-});
+  ["wFrac","hFrac"].forEach(id=>{
+    const sel=document.getElementById(id);
+    sel.innerHTML = "";
+    FRACTIONS.forEach(([label,val])=>{
+      const opt=document.createElement("option");
+      opt.value=val;
+      opt.textContent=label;
+      sel.appendChild(opt);
+    });
+    sel.value = "0";
+  });
 }
 
 function num(id){
-const v=parseFloat(document.getElementById(id).value);
-return isFinite(v)?v:0;
+  const v=parseFloat(document.getElementById(id).value);
+  return isFinite(v)?v:0;
 }
 
 function addWindow(){
-const room=document.getElementById("room").value;
-const wWhole=num("wWhole");
-const hWhole=num("hWhole");
-const wFrac=num("wFrac");
-const hFrac=num("hFrac");
+  const room=document.getElementById("room").value;
 
-const w=wWhole+wFrac;
-const h=hWhole+hFrac;
+  const wWhole=num("wWhole");
+  const hWhole=num("hWhole");
+  const wFrac=num("wFrac");
+  const hFrac=num("hFrac");
 
-if(savedPrice===null||savedPrice===0){
-savedPrice=num("price");
-}
+  const w=wWhole+wFrac;
+  const h=hWhole+hFrac;
 
-const extras=num("extras");
+  // price stays for the job once set
+  if(savedPrice===null || savedPrice===0){
+    savedPrice=num("price");
+  }
 
-const adjW=w+5;
-const adjH=h+5;
+  const extras=num("extras"); // per-window
 
-const sqft=Math.ceil((adjW*adjH)/144);
-const total=(sqft*savedPrice)+extras;
+  // +5" pricing only
+  const adjW=w+5;
+  const adjH=h+5;
 
-job.push({
-room:room||"-",
-size:`${wWhole} ${document.getElementById("wFrac").selectedOptions[0].text} x ${hWhole} ${document.getElementById("hFrac").selectedOptions[0].text}`,
-sqft,
-total
-});
+  const sqft=Math.ceil((adjW*adjH)/144);
+  const total=(sqft*savedPrice)+extras;
 
-render();
-clearInputs();
+  job.push({
+    room:room||"-",
+    size:`${wWhole} ${document.getElementById("wFrac").selectedOptions[0].text} x ${hWhole} ${document.getElementById("hFrac").selectedOptions[0].text}`,
+    sqft,
+    total
+  });
+
+  render();
+  clearInputs();
 }
 
 function render(){
-const tbody=document.getElementById("jobRows");
-tbody.innerHTML="";
-let grand=0;
+  const tbody=document.getElementById("jobRows");
+  tbody.innerHTML="";
+  let grand=0;
 
-job.forEach((it,i)=>{
-grand+=it.total;
-tbody.innerHTML+=`
-<tr>
-<td>${i+1}</td>
-<td>${it.room}</td>
-<td>${it.size}</td>
-<td>${it.sqft}</td>
-<td>$${it.total.toFixed(2)}</td>
-</tr>`;
-});
+  job.forEach((it,i)=>{
+    grand+=it.total;
+    tbody.innerHTML+=`
+      <tr>
+        <td>${i+1}</td>
+        <td>${it.room}</td>
+        <td>${it.size}</td>
+        <td>${it.sqft}</td>
+        <td>$${it.total.toFixed(2)}</td>
+      </tr>`;
+  });
 
-document.getElementById("grandTotal").innerText=
-"Grand Total: $"+grand.toFixed(2);
+  document.getElementById("grandTotal").innerText=
+    "Grand Total: $"+grand.toFixed(2);
 }
 
 function clearInputs(){
-document.getElementById("room").value="";
-document.getElementById("wWhole").value=0;
-document.getElementById("hWhole").value=0;
-document.getElementById("wFrac").value="0";
-document.getElementById("hFrac").value="0";
+  document.getElementById("room").value="";
+  document.getElementById("wWhole").value=0;
+  document.getElementById("hWhole").value=0;
+  document.getElementById("wFrac").value="0";
+  document.getElementById("hFrac").value="0";
+  document.getElementById("extras").value=0; // clears extra fee after each window
 }
 
 function clearJob(){
-job=[];
-savedPrice=null;
-document.getElementById("price").value=0;
-render();
-clearInputs();
+  job=[];
+  savedPrice=null;
+  document.getElementById("price").value=0; // reset price per ft when job cleared
+  render();
+  clearInputs();
 }
 
 function emailQuote(){
-let grand=0;
-let lines=job.map((it,i)=>{
-grand+=it.total;
-return `${i+1}. ${it.room} - ${it.size} - ${it.sqft} sq ft - $${it.total.toFixed(2)}`;
-}).join("\n");
+  const custName = document.getElementById("custName").value.trim();
+  const jobAddress = document.getElementById("jobAddress").value.trim();
+  const jobNumber = document.getElementById("jobNumber").value.trim();
 
-const subject=`C&C Quote`;
-const body=`Grand Total: $${grand.toFixed(2)}\n\n${lines}`;
+  let grand=0;
+  let lines=job.map((it,i)=>{
+    grand+=it.total;
+    return `${i+1}. ${it.room} - ${it.size} - ${it.sqft} sq ft - $${it.total.toFixed(2)}`;
+  }).join("\n");
 
-window.location.href=`mailto:Brett.ccshutter@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const subject = `C&C Quote${jobNumber ? " #"+jobNumber : ""}${custName ? " - "+custName : ""}`;
+  const body =
+`Customer: ${custName}
+Address: ${jobAddress}
+Quote/Job #: ${jobNumber}
+
+Windows:
+${lines || "(none)"}
+
+Grand Total: $${grand.toFixed(2)}
+
+Tip: To attach a PDF, click "Print / Save PDF" first, then attach it to this email.`;
+
+  window.location.href =
+    `mailto:Brett.ccshutter@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-document.querySelectorAll(".autoClear").forEach(input=>{
-input.addEventListener("focus",function(){
-if(this.value==="0"){ this.select(); }
-});
+// Auto-replace zero when typing: highlight 0 on focus
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".autoClear").forEach(input=>{
+    input.addEventListener("focus", function(){
+      if(this.value === "0"){ this.select(); }
+    });
+  });
 });
 
 document.getElementById("jobNumber").addEventListener("input",()=>{
-document.getElementById("jobOut").innerText=
-document.getElementById("jobNumber").value||"—";
+  document.getElementById("jobOut").innerText=
+    document.getElementById("jobNumber").value||"—";
 });
 
 document.getElementById("today").innerText=
-new Date().toLocaleDateString();
+  new Date().toLocaleDateString();
 
 populateFractions();
 </script>
